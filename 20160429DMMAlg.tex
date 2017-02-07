@@ -1,0 +1,85 @@
+\documentclass{beamer}
+\usepackage{hyperref}
+\usenavigationsymbolstemplate{}
+\setbeamertemplate{footline}[frame number]
+\newcounter{saveenumi}
+\newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
+\newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
+\begin{document}
+\everymath{\displaystyle}
+\begin{frame}
+\frametitle{An Event Driven Algorithm for Simulating the Decision Making
+Model}
+\begin{itemize}
+\item An event driven algorithm only does computations when something happens.
+In the DMM, this corresponds to a unit changing state.
+
+\item The idea here is to draw a time at which a unit will switch state, and
+modify this time to account for the dynamics of the other units.
+\end{itemize}
+\begin{equation}
+\frac{\partial p_1}{\partial t}=-g_0 e^{\frac{K}{2d}(N_2-N_1)}p_1
+\end{equation}
+\begin{equation}
+p_1=e^{-tg_0 e^{\frac{K}{2d}(N_2-N_1)}}
+\end{equation}
+Where $p_1$ is the probability of being in state $1$ given that the unit is initially in state $1$ and no transitions have occurred so far, $d$ is the number of neighbours divided by $2$, and $N_i$ is the number of neighbours in the state $i$.  Interpreting this as a survival probability, one can draw a random
+number from [0,1] to obtain an estimate (exact in the case that none of
+the neighbours change state) for the time at which the unit will next
+change state.
+\end{frame}
+\begin{frame}
+Suppose the random number drawn is $r$, then one can find the
+corresponding time:
+\begin{equation}
+r=e^{-tg_0 e^{\frac{K}{2d}(N_2-N_1)}}\quad\Rightarrow\quad t=-\frac{e^
+{-\frac{K}{2d}(N_2-N_1)}}{g_0}\ln(r).
+\end{equation}
+Since there is no timestep in this algorithm, one is free to choose
+dimensionless units, yielding:
+\begin{equation}\label{tdist}
+t=-e^{-\frac{K}{2d}(N_2-N_1)}\ln(r).
+\end{equation}
+\begin{enumerate}
+\item Initially, one assigns the states of the units, then draws a
+random number for each, and determines the estimated switching time for
+each unit via Eq.~(\ref{tdist}).
+\item Find the unit with the smallest time, draw a new time for that
+unit according to Eq.~(\ref{tdist}), and update the times of its
+neighbours according to Eq.~(\ref{updt}).  This can be done in a
+computational time proportional to $d$, and independent of the total
+number of units \cite{O1BPQ}.
+\seti
+\end{enumerate}
+\end{frame}
+\begin{frame}
+%\begin{enumerate}
+%\conti
+
+%\seti
+%\end{enumerate}
+\begin{align}\label{updt}
+r=&e^{-t_fe^{\frac{K}{2d}(N_2-N_1)}}e^{-(t_n-t_f)e^{\frac{K}{2d}(N_2-
+N_1)}e^{\pm\frac{K}{d}}}\nonumber\\\text{thus, }t_n=&t_f+(t_o-t_f)e^{
+\mp\frac{K}{d}}
+\end{align}
+Where $t_o$ is the old switching time estimate, $t_f$ is the current
+time, $t_n$ is the new estimate of the time at which the unit will
+switch states, and the sign in the exponent is chosen based on whether
+the unit that just switched is now in the same (corresponding to the
+lower sign) or opposite (upper sign) state as the neighbour being
+updated.
+\begin{enumerate}
+\conti
+\item Repeat step 2 until stopping criterion is satisfied.
+\end{enumerate}
+The computational time of this algorithm is better than or comparable to
+that of the usual approach based on timesteps, but does not suffer from
+the possibility of having too large a timestep.
+\end{frame}
+\begin{frame}
+\frametitle{References}
+\bibliographystyle{apsrev4-1}
+\bibliography{20160429DMMAlg}
+\end{frame}
+\end{document}
